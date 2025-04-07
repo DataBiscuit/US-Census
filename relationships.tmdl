@@ -1,0 +1,4 @@
+relationship AutoDetected_596790d2-ffb9-4462-b39b-b760b22cb8a5
+	fromColumn: 'States Population'.Abbreviation
+	toColumn: States.Abbreviation
+

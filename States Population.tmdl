@@ -1,0 +1,46 @@
+table 'States Population'
+	lineageTag: 9d41d7f7-ae4a-4bbc-80cc-adc682645585
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 18dbee56-d64c-4d4d-833b-48619c19f5e7
+		summarizeBy: sum
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Abbreviation
+		dataType: string
+		lineageTag: 4dfc3531-2df1-4b7c-951d-885a23943c93
+		summarizeBy: none
+		sourceColumn: Abbreviation
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'State Population'
+		dataType: int64
+		formatString: 0
+		lineageTag: c7ccb229-723a-4b01-b336-71b08c1d75dc
+		summarizeBy: sum
+		sourceColumn: State Population
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'States Population' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\chris harris\Downloads\edx-power-bi-exercise-files\Week 1\us-states-population-by-year.csv"),[Delimiter=",", Columns=52, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Year", Int64.Type}, {"AL", Int64.Type}, {"AK", Int64.Type}, {"AZ", Int64.Type}, {"AR", Int64.Type}, {"CA", Int64.Type}, {"CO", Int64.Type}, {"CT", Int64.Type}, {"DE", Int64.Type}, {"FL", Int64.Type}, {"GA", Int64.Type}, {"HI", Int64.Type}, {"ID", Int64.Type}, {"IL", Int64.Type}, {"IN", Int64.Type}, {"IA", Int64.Type}, {"KS", Int64.Type}, {"KY", Int64.Type}, {"LA", Int64.Type}, {"ME", Int64.Type}, {"MD", Int64.Type}, {"MA", Int64.Type}, {"MI", Int64.Type}, {"MN", Int64.Type}, {"MS", Int64.Type}, {"MO", Int64.Type}, {"MT", Int64.Type}, {"NE", Int64.Type}, {"NV", Int64.Type}, {"NH", Int64.Type}, {"NJ", Int64.Type}, {"NM", Int64.Type}, {"NY", Int64.Type}, {"NC", Int64.Type}, {"ND", Int64.Type}, {"OH", Int64.Type}, {"OK", Int64.Type}, {"OR", Int64.Type}, {"PA", Int64.Type}, {"RI", Int64.Type}, {"SC", Int64.Type}, {"SD", Int64.Type}, {"TN", Int64.Type}, {"TX", Int64.Type}, {"UT", Int64.Type}, {"VT", Int64.Type}, {"VA", Int64.Type}, {"WA", Int64.Type}, {"WV", Int64.Type}, {"WI", Int64.Type}, {"WY", Int64.Type}, {"DC", Int64.Type}}),
+				    #"Unpivoted Other Columns" = Table.UnpivotOtherColumns(#"Changed Type", {"Year"}, "Attribute", "Value"),
+				    #"Renamed Columns" = Table.RenameColumns(#"Unpivoted Other Columns",{{"Attribute", "Abbreviation"}, {"Value", "State Population"}}),
+				    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns", each [Year] >= 1950)
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

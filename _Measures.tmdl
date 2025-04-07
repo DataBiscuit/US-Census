@@ -1,0 +1,77 @@
+table _Measures
+	lineageTag: 5de34158-7627-464d-a855-e6c5fad169ca
+
+	measure States = COUNT(States[State])
+		formatString: 0
+		lineageTag: 8ca99eca-b706-495d-be29-d07dc9341e9f
+
+		changedProperty = IsHidden
+
+	measure Population = SUM('States Population'[State Population])
+		formatString: #,0
+		lineageTag: a610312d-7a84-4eda-a540-8e77f798cbe1
+
+	measure 'Tooltip title' =
+			
+			SELECTEDVALUE( States[State]) & " - Years "
+			    & MIN( 'States Population'[Year]) & "-"
+			    & MAX( 'States Population'[Year])
+		lineageTag: b346bbad-61db-4519-a2c8-8b54f05ae4b6
+
+	measure 'Begin Population' = ```
+			
+			CALCULATE( 
+			    [Population],
+			    'States Population'[Year] = MIN('States Population'[Year])
+			)
+			```
+		formatString: #,0
+		lineageTag: 1cfbe5fe-542a-49ab-92fa-91abc0c962a5
+
+	measure 'End Population' = ```
+			
+			CALCULATE( 
+			    [Population],
+			    'States Population'[Year] = MAX('States Population'[Year])
+			)
+			```
+		formatString: #,0
+		lineageTag: 9bedc729-f78b-4a15-9ac8-f993e034b72d
+
+	measure 'Growth Rate' =
+			
+			DIVIDE([End Population] - [Begin Population], [Begin Population], 0)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 1e542df6-d287-431d-a23b-27d26a179e2b
+
+	measure 'Table Title' = ```
+			
+			"Population Growth By State From"
+			   & MIN('States Population'[Year]) & " to "
+			   & MAX('States Population'[Year])  
+			```
+		lineageTag: 46e2068f-acdf-4ca4-966e-477c98834e87
+
+	column _
+		dataType: string
+		lineageTag: 73fb19c8-8d8e-47e4-a234-37a8daf27b83
+		summarizeBy: none
+		sourceColumn: _
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [_ = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"_", type text}})
+				in
+				    #"Changed Type"
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+
