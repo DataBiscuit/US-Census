@@ -18,4 +18,4 @@ The dataset was curated from a CSV file:
 
 ## License
 
-Every GitHub project should include a license that stipulates how your project code may be used. You should link to your license here: GNU General Public Licence v.2.0
+Every GitHub project should include a license that stipulates how your project code may be used. You should link to your license here: GNU General Public Licence v.3.0
